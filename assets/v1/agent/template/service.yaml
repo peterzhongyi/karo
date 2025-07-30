@@ -1,0 +1,19 @@
+# This template generates the Kubernetes Service to expose the Agent.
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .resource.metadata.name }}
+  namespace: {{ .resource.metadata.namespace }}
+spec:
+  # Set the Service type from the CR's spec. Default to LoadBalancer.
+  type: {{ or .resource.spec.service.type "LoadBalancer" }}
+  selector:
+    # This selector MUST match the labels on the pods in the Deployment template.
+    app: {{ .resource.metadata.name }}
+  ports:
+    - name: http
+      protocol: TCP
+      # The port the Service listens on.
+      port: 80
+      # The port on the container to forward traffic to.
+      targetPort: {{ .resource.spec.port }}

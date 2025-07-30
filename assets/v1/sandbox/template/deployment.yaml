@@ -1,0 +1,70 @@
+{{- $class := findResource .resources "AgenticSandboxClass" .resource.spec.className }}
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .resource.metadata.name }}
+  namespace: {{ .resource.metadata.namespace }}
+  labels:
+    app.kubernetes.io/name: "agentic-sandbox"
+    app.kubernetes.io/instance: {{ .resource.metadata.name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: "agentic-sandbox"
+      app.kubernetes.io/instance: {{ .resource.metadata.name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: "agentic-sandbox"
+        app.kubernetes.io/instance: {{ .resource.metadata.name }}
+    spec:
+      {{- if $class.spec.podSecurityContext }}
+      securityContext:
+        runAsNonRoot: {{ $class.spec.podSecurityContext.runAsNonRoot }}
+        runAsUser: {{ $class.spec.podSecurityContext.runAsUser }}
+        fsGroup: {{ $class.spec.podSecurityContext.fsGroup }}
+        seccompProfile:
+          type: {{ $class.spec.podSecurityContext.seccompProfile.type }}
+      {{- end }}
+      {{- if $class.spec.runtimeClassName }}
+      runtimeClassName: "{{ $class.spec.runtimeClassName }}"
+      {{- end }}
+      {{- if $class.spec.tolerations }}
+      tolerations:
+      {{- range $class.spec.tolerations }}
+        - key: "{{ .key }}"
+          operator: "{{ .operator }}"
+          {{- if .value }}
+          value: "{{ .value }}"
+          {{- end }}
+          effect: "{{ .effect }}"
+          {{- if .tolerationSeconds }}
+          tolerationSeconds: {{ .tolerationSeconds }}
+          {{- end }}
+      {{- end }}
+      {{- end }}
+      containers:
+      - name: "sandbox-runtime"
+        image: {{ $class.spec.image }}
+        resources:
+            # Handle resource requests.
+            requests:
+              cpu: {{ or $class.spec.resourceRequirements.requests.cpu "500m" }}
+              memory: {{ or $class.spec.resourceRequirements.requests.memory "2Gi" }}
+              ephemeral-storage: {{ or $class.spec.resourceRequirements.requests.ephemeralStorage "1Gi" }}
+            # Handle resource limits.
+            limits:
+              cpu: {{ or $class.spec.resourceRequirements.limits.cpu "500m" }}
+              memory: {{ or $class.spec.resourceRequirements.limits.memory "2Gi" }}
+              ephemeral-storage: {{ or $class.spec.resourceRequirements.limits.ephemeralStorage "1Gi" }}
+        ports:
+        - containerPort: {{ $class.spec.serverPort }}
+          name: "http"
+        readinessProbe:
+          httpGet:
+            path: "/"
+            port: {{ $class.spec.serverPort }}
+          initialDelaySeconds: 5
+          periodSeconds: 10

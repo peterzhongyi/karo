@@ -1,0 +1,8 @@
+apiVersion: model.skippy.io/v1
+kind: AgenticSandbox
+metadata:
+  name: my-first-sandbox
+  namespace: default
+spec:
+  className: "datascience-class"
+

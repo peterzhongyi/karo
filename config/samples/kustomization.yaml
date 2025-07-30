@@ -1,0 +1,5 @@
+## Append samples of your project ##
+resources:
+- model_v1_integration.yaml
+- model_v1_endpoint.yaml
+#+kubebuilder:scaffold:manifestskustomizesamples

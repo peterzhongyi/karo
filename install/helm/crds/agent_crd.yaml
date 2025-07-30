@@ -1,0 +1,139 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: agents.model.skippy.io
+spec:
+  group: model.skippy.io
+  names:
+    plural: agents
+    singular: agent
+    kind: Agent
+    shortNames:
+      - ag
+  scope: Namespaced
+  versions:
+    - name: v1
+      served: true
+      storage: true
+      # This enables the /status subresource, just like in your HelloWorld CRD
+      subresources:
+        status: {}
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              # The spec block remains the same as before
+              type: object
+              description: "Defines the desired state of the Agent."
+              required:
+                - image
+                - adkVersion
+                - port
+              properties:
+                image:
+                  type: string
+                  description: "The container image for the agent (e.g., gcr.io/my-project/my-agent:latest)."
+                adkVersion:
+                  type: string
+                  description: "The version of the Google ADK, used for labeling resources."
+                port:
+                  type: integer
+                  description: "The port that the agent's container will listen on."
+                  default: 8000
+                deployment:
+                  type: object
+                  description: "Specifications for the underlying Kubernetes Deployment."
+                  properties:
+                    replicas:
+                      type: integer
+                      description: "Number of desired agent pods."
+                      default: 1
+                    resources:
+                      type: object
+                      description: "Compute resource requirements for the agent container."
+                      properties:
+                        requests:
+                          type: object
+                          additionalProperties:
+                            type: string
+                        limits:
+                          type: object
+                          additionalProperties:
+                            type: string
+                service:
+                  type: object
+                  description: Configures the Kubernetes Service to expose the Agent.
+                  properties:
+                    type:
+                      type: string
+                      description: The type of Kubernetes Service to create.
+                      enum: [ClusterIP, NodePort, LoadBalancer]
+                      default: ClusterIP
+                    # ... other spec fields like labels, annotations, tolerations ...
+                # ... service, config, gcp blocks ...
+
+            # --- THIS IS THE UPDATED SECTION ---
+            status:
+              type: object
+              description: "Most recently observed status of the Agent resource."
+              properties:
+                observedGeneration:
+                  type: integer
+                  format: int64
+                  description: "The most recent generation of the spec that the controller has observed."
+                conditions:
+                  type: array
+                  description: "Represents the observations of the Agent's current state."
+                  items:
+                    type: object
+                    required: ["type", "status", "lastTransitionTime"]
+                    properties:
+                      type:
+                        type: string
+                        description: "Type of a condition (e.g., Ready, ResourcesCreated)."
+                      status:
+                        type: string
+                        description: "Status of the condition, one of True, False, Unknown."
+                      lastTransitionTime:
+                        type: string
+                        format: date-time
+                        description: "The last time this condition transitioned."
+                      reason:
+                        type: string
+                        description: "A brief reason for the condition's last transition."
+                      message:
+                        type: string
+                        description: "A human-readable message about the last transition."
+                dependentResources:
+                  type: array
+                  description: "A list of resources managed by this Agent CR."
+                  items:
+                    type: object
+                    properties:
+                      kind:
+                        type: string
+                      name:
+                        type: string
+                      namespace:
+                        type: string
+                      status:
+                        type: string
+                      uid:
+                        type: string
+                        format: uuid
+                createdResourceCount:
+                  type: integer
+                  format: int64
+                  description: "Number of dependent resources managed."
+      additionalPrinterColumns:
+        - name: Image
+          type: string
+          jsonPath: .spec.image
+        - name: Replicas
+          type: integer
+          jsonPath: .spec.deployment.replicas
+        - name: Status
+          type: string
+          # This still works with the new rich condition type
+          jsonPath: .status.conditions[?(@.type=='Ready')].status

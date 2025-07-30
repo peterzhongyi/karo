@@ -1,0 +1,12 @@
+apiVersion: model.skippy.io/v1
+kind: Integration
+metadata:
+  name: skippy-integrations
+spec:
+  - group: model.skippy.io
+    version: v1
+    kind: Agent
+    templates:
+      - operation: template
+        path: "embedded:/v1/agent/template" #"gcs:/skippy-kustomization-templates/integrations/model-data/template"
+    hashes: []

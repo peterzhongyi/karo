@@ -1,0 +1,27 @@
+apiVersion: model.skippy.io/v1
+kind: Integration
+metadata:
+  name: skippy-integrations
+spec:
+  - group: model.skippy.io
+    version: v1
+    kind: AgenticSandboxClass
+    templates:
+      - operation: template
+        path: "embedded:/v1/sandbox-class/template" #"gcs:/skippy-kustomization-templates/integrations/model-data/template"
+    hashes: []
+ 
+  - group: model.skippy.io
+    version: v1
+    kind: AgenticSandbox
+    # The references are also updated
+    references:
+      - kind: AgenticSandboxClass
+        group: model.skippy.io
+        version: v1
+        paths:
+          name: metadata.name
+          namespace: metadata.namespace
+    templates:
+      - operation: template
+        path: "embedded:/v1/sandbox/template"

@@ -1,0 +1,7 @@
+apiVersion: model.skippy.io/v1
+kind: HelloWorld
+metadata:
+  name: vicente
+  namespace: default
+spec:
+  message: HELLO-FROM-SKIPPY # The 'name' in the spec (currently unused in the template, but present)

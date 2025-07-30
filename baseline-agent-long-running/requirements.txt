@@ -1,0 +1,6 @@
+google-genai>=1.21.1
+fastapi
+uvicorn[standard]
+pydantic
+# e2b_desktop
+agentic_sandbox

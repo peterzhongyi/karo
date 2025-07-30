@@ -1,0 +1,28 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ai-connector-operator
+rules:
+- apiGroups:
+  - model.skippy.io
+  resources:
+  - integrations
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - model.skippy.io
+  resources:
+  - integrations/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - model.skippy.io
+  resources:
+  - integrations/status
+  verbs:
+  - get
+  - patch
+  - update

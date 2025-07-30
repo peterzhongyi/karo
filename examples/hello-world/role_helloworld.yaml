@@ -1,0 +1,83 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: skippy-ai-connector-operator
+rules:
+- apiGroups:
+  - model.skippy.io
+  resources:
+  - integrations
+  - endpoints
+  - helloworlds
+  - monitors/finalizers
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - model.skippy.io
+  resources:
+  - integrations/finalizers
+  - endpoints/finalizers
+  - helloworlds/finalizers
+  - monitors/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - model.skippy.io
+  resources:
+  - integrations/status
+  - endpoints/status
+  - helloworlds/status
+  - monitors/status
+  verbs:
+  - get
+  - patch
+  - update
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: skippy-controller-manager-cluster-role
+rules:
+- apiGroups:
+  - apps
+  resources:
+  - deployments
+  verbs:
+  - create
+  - get
+  - update
+  - patch
+  - delete
+  - watch
+  - list
+- apiGroups:
+  - ""
+  resources:
+  - services
+  - pods
+  - configmaps
+  - secrets
+  verbs:
+  - create
+  - get
+  - update
+  - patch
+  - delete
+  - watch
+  - list
+- apiGroups:
+  - model.skippy.io
+  resources:
+  - endpoints
+  - monitors
+  - helloworlds
+  verbs:
+  - create
+  - get
+  - update
+  - patch
+  - delete
+  - watch
+  - list

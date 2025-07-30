@@ -1,0 +1,27 @@
+apiVersion: model.skippy.io/v1
+kind: Agent
+metadata:
+  # This name will be used for the Deployment and Service
+  name: adk-default-service-name
+  namespace: default
+spec:
+  # The image from your Deployment
+  image: "gcr.io/vicenteferrara-gke-dev/adk-default-service-name"
+  # The version from your Deployment's labels
+  adkVersion: "1.5.0"
+  # The container port from your Deployment
+  port: 8080
+
+  #deployment:
+  #  replicas: 1
+    # This directly maps to the resources in your running pod
+  #  resources:
+  #    requests:
+        #cpu: "500m"
+   #     memory: "2Gi"
+   #     ephemeralStorage: "1Gi"
+   #   limits:
+   #     ephemeralStorage: "1Gi"
+
+  #service:
+  #  type: LoadBalancer

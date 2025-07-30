@@ -1,0 +1,19 @@
+{{- $class := findResource .resources "AgenticSandboxClass" .resource.spec.className }}
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .resource.metadata.name }}
+  namespace: {{ .resource.metadata.namespace }}
+  labels:
+    app.kubernetes.io/name: "agentic-sandbox"
+    app.kubernetes.io/instance: {{ .resource.metadata.name }}
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: "agentic-sandbox"
+    app.kubernetes.io/instance: {{ .resource.metadata.name }}
+  ports:
+  - port: {{ $class.spec.serverPort }}
+    targetPort: {{ $class.spec.serverPort }}
+    protocol: TCP

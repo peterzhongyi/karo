@@ -1,0 +1,30 @@
+# This manifest grants the necessary permissions for an agent application
+# to create, manage, and delete its own AgenticSandbox resources.
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  # This Role will be created in the 'default' namespace, where the agent runs.
+  name: agent-sandbox-user
+  namespace: default
+rules:
+- apiGroups: ["model.skippy.io"] # The API group for your CRDs.
+  resources: ["agenticsandboxes"] # The resource the agent needs to control.
+  verbs: ["create", "get", "watch", "list", "delete"] # The specific actions allowed.
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: bind-agent-to-sandbox-role
+  namespace: default
+subjects:
+- kind: ServiceAccount
+  # This MUST match the serviceAccountName in your agent's Deployment.
+  name: skippy-controller-manager
+  namespace: default
+roleRef:
+  kind: Role
+  # This binds the ServiceAccount to the 'agent-sandbox-user' Role defined above.
+  name: agent-sandbox-user
+  apiGroup: rbac.authorization.k8s.io

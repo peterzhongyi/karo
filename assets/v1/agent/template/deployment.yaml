@@ -1,0 +1,44 @@
+# This template generates a Kubernetes Deployment based on the Agent CR.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .resource.metadata.name }}
+  namespace: {{ .resource.metadata.namespace }}
+  labels:
+    app.kubernetes.io/name: "adk-agent"
+    app.kubernetes.io/instance: {{ .resource.metadata.name }}
+    app.kubernetes.io/version: "{{ .resource.spec.adkVersion }}"
+    app.kubernetes.io/managed-by: "skippy"
+spec:
+  replicas: {{ or .resource.spec.deployment.replicas 1 }}
+  selector:
+    matchLabels:
+      app: {{ .resource.metadata.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .resource.metadata.name }}
+        app.kubernetes.io/name: "adk-agent"
+        app.kubernetes.io/instance: {{ .resource.metadata.name }}
+        app.kubernetes.io/version: "{{ .resource.spec.adkVersion }}"
+        app.kubernetes.io/managed-by: "skippy"
+    spec:
+      containers:
+        - name: {{ .resource.metadata.name }}
+          image: "{{ .resource.spec.image }}"
+          ports:
+            - containerPort: {{ .resource.spec.port }}
+          
+          # Check if the resources block is defined in the Agent CR.
+          resources:
+            # Handle resource requests.
+            requests:
+              cpu: {{ or .resource.spec.deployment.resources.requests.cpu "500m" }}
+              memory: {{ or .resource.spec.deployment.resources.requests.memory "2Gi" }}
+              ephemeral-storage: {{ or .resource.spec.deployment.resources.requests.ephemeralStorage "1Gi" }}
+
+            # Handle resource limits.
+            limits:
+              cpu: {{ or .resource.spec.deployment.resources.limits.cpu "500m" }}
+              memory: {{ or .resource.spec.deployment.resources.limits.memory "2Gi" }}
+              ephemeral-storage: {{ or .resource.spec.deployment.resources.limits.ephemeralStorage "1Gi" }}

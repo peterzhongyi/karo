@@ -1,0 +1,19 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/name: clusterrolebinding
+    app.kubernetes.io/instance: ai-connector-operator-binding
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: skippy
+    app.kubernetes.io/part-of: skippy
+    app.kubernetes.io/managed-by: kustomize
+  name: ai-connector-operator-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: ai-connector-operator
+subjects:
+- kind: ServiceAccount
+  name: controller-manager
+  namespace: default

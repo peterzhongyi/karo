@@ -1,0 +1,215 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: skippy
+    app.kubernetes.io/instance: controller-manager-sa
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: serviceaccount
+    app.kubernetes.io/part-of: skippy
+  {{- if .Values.serviceAccount.gcpServiceAccount }}
+  annotations:
+    iam.gke.io/gcp-service-account: {{ .Values.serviceAccount.gcpServiceAccount }}
+  {{- end }}
+  name: {{ .Values.serviceAccount.name }}
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: skippy
+    app.kubernetes.io/instance: leader-election-rolebinding
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: rolebinding
+    app.kubernetes.io/part-of: skippy
+  name: {{ .Values.roleBinding.leaderElectionName }}
+  namespace: default
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ .Values.role.leaderElectionName }}
+subjects:
+- kind: ServiceAccount
+  name: {{ .Values.serviceAccount.name }}
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: skippy
+    app.kubernetes.io/instance: ai-connector-operator-binding
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: clusterrolebinding
+    app.kubernetes.io/part-of: skippy
+  name: {{ .Values.clusterRoleBinding.operatorName }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ .Values.clusterRole.operatorName }}
+subjects:
+- kind: ServiceAccount
+  name: {{ .Values.serviceAccount.name }}
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ .Values.clusterRoleBinding.managerName }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ .Values.clusterRole.managerName }}
+subjects:
+- kind: ServiceAccount
+  name: {{ .Values.serviceAccount.name }}
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  labels:
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: skippy
+    app.kubernetes.io/instance: leader-election-role
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: role
+    app.kubernetes.io/part-of: skippy
+  name: {{ .Values.role.leaderElectionName }}
+  namespace: default
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ .Values.clusterRole.operatorName }}
+rules:
+# Allow to manage (get, list, watch, create, update, patch, delete) resources in model.skippy.io
+- apiGroups:
+  - model.skippy.io
+  resources:
+  - "*"
+  verbs:
+  - "*"
+# Allow to list resources in all the other api groups
+- apiGroups:
+    - '*'
+  resources:
+    - '*'
+  verbs:
+    - get
+    - list
+    - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ .Values.clusterRole.managerName }}
+rules:
+- apiGroups:
+  - apps
+  resources:
+  - deployments
+  verbs:
+  - create
+  - get
+  - update
+  - patch
+  - delete
+  - watch
+  - list
+- apiGroups:
+  - ""
+  resources:
+  - services
+  - pods
+  - configmaps
+  - secrets
+  verbs:
+  - create
+  - get
+  - update
+  - patch
+  - delete
+  - watch
+  - list
+- apiGroups:
+  - batch 
+  resources:
+  - jobs
+  - cronjobs
+  verbs:
+  - create
+  - get
+  - update
+  - patch
+  - delete
+  - watch
+  - list
+- apiGroups:
+  - autoscaling
+  resources:
+  - horizontalpodautoscalers # Or hpas
+  verbs:
+  - create
+  - get
+  - update
+  - patch
+  - delete
+  - watch
+  - list
+- apiGroups:
+  - monitoring.googleapis.com # For Google Cloud Managed Service for Prometheus
+  - monitoring.coreos.com # For upstream Prometheus Operator
+  resources:
+  - podmonitorings
+  verbs:
+  - create
+  - get
+  - update
+  - patch
+  - delete
+  - watch
+  - list
+- apiGroups:
+  - model.skippy.io
+  resources:
+  - "*"
+  verbs:
+  - "*"
+---

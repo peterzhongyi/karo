@@ -1,0 +1,82 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: agenticsandboxes.model.skippy.io
+spec:
+  group: model.skippy.io
+  scope: Namespaced
+  names:
+    plural: agenticsandboxes
+    singular: agenticsandbox
+    kind: AgenticSandbox
+    shortNames:
+    - asbox
+  versions:
+    - name: v1
+      served: true
+      storage: true
+      subresources:
+        status: {}
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              required: ["className"]
+              properties:
+                className:
+                  type: string
+                  description: "The name of the AgenticSandboxClass to use for this instance."
+            status:
+              type: object
+              description: "AgenticSandboxStatus defines the observed state of AgenticSandbox"
+              properties:
+                conditions:
+                  description: "Conditions store the detailed status of the sandbox."
+                  type: array
+                  items:
+                    description: "Condition contains details for one aspect of the current state of this API Resource."
+                    type: object
+                    required: ["lastTransitionTime", "message", "reason", "status", "type"]
+                    properties:
+                      lastTransitionTime:
+                        description: "lastTransitionTime is the last time the condition transitioned from one status to another."
+                        type: string
+                        format: date-time
+                      message:
+                        description: "message is a human readable message indicating details about the transition."
+                        type: string
+                        maxLength: 32768
+                      observedGeneration:
+                        description: "observedGeneration represents the .metadata.generation that the condition was set based upon."
+                        type: integer
+                        format: int64
+                        minimum: 0
+                      reason:
+                        description: "reason contains a programmatic identifier indicating the reason for the condition's last transition."
+                        type: string
+                        maxLength: 1024
+                        minLength: 1
+                        pattern: "^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$"
+                      status:
+                        description: "status of the condition, one of True, False, Unknown."
+                        type: string
+                        enum: ["True", "False", "Unknown"]
+                      type:
+                        description: "type of condition in CamelCase or in [foo.example.com/CamelCase](https://foo.example.com/CamelCase)."
+                        type: string
+                        maxLength: 316
+                        pattern: "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$"
+                phase:
+                  description: "Phase indicates the current high-level lifecycle phase of the sandbox."
+                  type: string
+                  enum: ["Pending", "Running", "Terminating"]
+                sandboxIP:
+                  description: "The internal ClusterIP of the Service pointing to the sandbox pod."
+                  type: string
+                serverPort:
+                  description: "The port number exposed by the sandbox Service."
+                  type: integer
+                  format: int32
+

@@ -1,0 +1,26 @@
+image:
+  repository: us-docker.pkg.dev/ai-on-gke/skippy/operator
+  tag: "v1.9" 
+
+serviceAccount:
+  gcpServiceAccount: ""  
+  name: skippy-controller-manager
+
+clusterRole:
+  operatorName: skippy-ai-connector-operator
+  managerName: skippy-controller-manager-cluster-role
+clusterRoleBinding:
+  operatorName: skippy-ai-connector-operator-binding
+  managerName: skippy-controller-manager-cluster-rolebinding
+role:
+  leaderElectionName: skippy-leader-election-role
+roleBinding:
+  leaderElectionName: skippy-leader-election-rolebinding
+
+deployment:
+  name: karo-controller-manager
+
+integration:
+  # gcs:/skippy-kustomization-templates/integrations
+  # embedded:/v1
+  path: embedded:/v1

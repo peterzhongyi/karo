@@ -1,0 +1,45 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: skippy-controller-manager-cluster-role
+rules:
+- apiGroups:
+  - apps
+  resources:
+  - deployments
+  verbs:
+  - create
+  - get
+  - update
+  - patch
+  - delete
+  - watch
+  - list
+- apiGroups:
+  - ""
+  resources:
+  - services
+  - pods
+  - configmaps
+  - secrets
+  verbs:
+  - create
+  - get
+  - update
+  - patch
+  - delete
+  - watch
+  - list
+- apiGroups:
+  - model.skippy.io
+  resources:
+  - endpoints
+  - monitors
+  verbs:
+  - create
+  - get
+  - update
+  - patch
+  - delete
+  - watch
+  - list

@@ -1,0 +1,96 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: helloworlds.model.skippy.io
+spec:
+  group: model.skippy.io
+  names:
+    plural: helloworlds
+    singular: helloworld
+    kind: HelloWorld
+  scope: Namespaced
+  versions:
+    - name: v1
+      served: true
+      storage: true
+      subresources:
+        status: {}
+      schema:
+        openAPIV3Schema:
+          type: object # Defines the root HelloWorld CR as an object
+          properties:
+            apiVersion:
+              type: string
+              description: "APIVersion defines the versioned schema of this representation of an object..." # (Standard description)
+            kind:
+              type: string
+              description: "Kind is a string value representing the REST resource this object represents..." # (Standard description)
+            metadata:
+              type: object # Standard Kubernetes metadata
+            spec:
+              type: object
+              description: "Specification of the desired behavior of the HelloWorld resource."
+              properties:
+                message:
+                  type: string
+                  description: "The message to be displayed by HelloWorld."
+              required: # Example: make message required in spec
+                - message
+            status:
+              type: object
+              description: "Most recently observed status of the HelloWorld resource."
+              # Optional: For unstructured status updates.
+              # x-kubernetes-preserve-unknown-fields: true
+              properties:
+                observedGeneration:
+                  type: integer
+                  format: int64
+                  description: "The most recent generation observed by the controller."
+                conditions:
+                  type: array
+                  description: "Represents the observations of the HelloWorld's current state."
+                  items:
+                    type: object
+                    required: ["type", "status", "lastTransitionTime"]
+                    properties:
+                      type:
+                        type: string
+                        description: "Type of a condition (e.g., Ready, ResourcesCreated)."
+                      status:
+                        type: string
+                        description: "Status of the condition, one of True, False, Unknown."
+                      lastTransitionTime:
+                        type: string
+                        format: date-time
+                        description: "The last time this condition transitioned."
+                      reason:
+                        type: string
+                        description: "A brief reason for the condition's last transition."
+                      message:
+                        type: string
+                        description: "A human-readable message about the last transition."
+                      observedGeneration:
+                        type: integer
+                        format: int64
+                        description: "The generation observed when this condition was last updated."
+                dependentResources:
+                  type: array
+                  description: "A list of resources managed by this HelloWorld CR."
+                  items:
+                    type: object
+                    properties:
+                      kind:
+                        type: string
+                      name:
+                        type: string
+                      namespace:
+                        type: string
+                      status:
+                        type: string
+                      uid:
+                        type: string
+                        format: uuid # This requires a valid UUID, not an empty string
+                createdResourceCount:
+                  type: integer
+                  format: int64
+                  description: "Number of dependent resources managed."

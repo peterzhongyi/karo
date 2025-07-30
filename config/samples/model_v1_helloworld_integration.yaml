@@ -1,0 +1,44 @@
+apiVersion: model.skippy.io/v1
+kind: Integration
+metadata:
+  name: skippy-integrations
+spec:
+  - group: model.skippy.io
+    version: v1
+    kind: Endpoint
+    context:
+      - name: model
+        request:
+          method: GET
+          path: https://{{ .resource.spec.region }}-aiplatform.googleapis.com/v1/projects/{{ .resource.spec.project_id }}/locations/{{ .resource.spec.region }}/models/{{ .resource.spec.model_id }}@{{ or .resource.spec.version "default" }}
+    templates:
+      - operation: copy
+        path: "embedded:/v1/endpoint/base"
+      - operation: copy
+        path: "embedded:/v1/endpoint/components/gpu"
+      - operation: template
+        path: "embedded:/v1/endpoint/template"
+    hashes: []
+
+  - group: model.skippy.io
+    version: v1
+    kind: Monitor
+    references:
+      - group: model.skippy.io
+        version: v1
+        kind: Endpoint
+        paths:
+          name: spec.endpoint.name
+          namespace: spec.endpoint.namespace
+    templates:
+      - operation: template
+        path: "embedded:/v1/monitor/template"
+    hashes: []
+
+  - group: model.skippy.io # Update the group to match your new CRD
+    version: v1
+    kind: HelloWorld
+    templates:
+      - operation: template # Use 'template' instead of 'copy'
+        path: "embedded:/v1/hello-world/template"
+    hashes: []

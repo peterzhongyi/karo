@@ -1,0 +1,12 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: skippy-controller-manager-cluster-rolebinding
+subjects:
+- kind: ServiceAccount
+  name: skippy-controller-manager
+  namespace: default
+roleRef:
+  kind: ClusterRole
+  name: skippy-controller-manager-cluster-role
+  apiGroup: rbac.authorization.k8s.io

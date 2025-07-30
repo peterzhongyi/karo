@@ -1,0 +1,34 @@
+apiVersion: model.skippy.io/v1
+kind: AgenticSandboxClass
+metadata:
+  # This is the name we will use to refer to this template.
+  name: datascience-class
+  namespace: default
+  labels:
+    sandbox.gke.agenticsandbox/class-type: datascience
+spec:
+  # IMAGE of Sandbox Runtime image we pushed before.
+  image: us-east4-docker.pkg.dev/vicenteferrara-gke-dev/sandbox-repo/sandbox-runtime:latest
+  serverPort: 8888
+  resourceRequirements:
+    requests:
+      cpu: "1900m"  #"2"
+      memory: "2Gi"
+    limits:
+      cpu: "4"
+      memory: "4Gi"
+  # Using the standard PodSecurityContext to define security settings
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    fsGroup: 1000
+    seccompProfile:
+      type: RuntimeDefault
+  runtimeClassName: gvisor
+  # This toleration allows pods created from this class to be scheduled on
+  # nodes that have the gVisor taint.
+  #tolerations:
+  #- key: "sandbox.gke.io/runtime"
+  #  operator: "Equal"
+  #  value: "gvisor"
+  #  effect: "NoSchedule"
